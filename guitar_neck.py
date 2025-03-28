@@ -205,31 +205,32 @@ try:
                         break
             
             if not(x_1 == -1):
-                if No_Two_Points: # We need to rely on voting
+                if No_Two_Points: # One hand -> detected
                     cv2.line(come_true, (x_1, y_1), (x_2, y_2), (0, 255, 0), 2) 
-                else:
+                else: #Two hands -> detected
                     x_min_1, y_min_1, x_max_1, y_max_1 = getboundingbox(results.multi_hand_landmarks[0])
                     x_min_2, y_min_2, x_max_2, y_max_2 = getboundingbox(results.multi_hand_landmarks[1])
                     x_1, y_1, x_2, y_2 = modify_line_to_x_bounds(x_1, y_1, x_2, y_2, min(x_min_1, x_max_1, x_min_2, x_max_2), 1620)
-                    hand_height = (y_max_1-y_min_1)//2 
-                    x1_perp, y1_perp, x2_perp, y2_perp = find_perpendicular_line(x_1, y_1, x_2, y_2, x_1, y_1, hand_height)
-                    x3_perp, y3_perp, x4_perp, y4_perp = find_perpendicular_line(x_1, y_1, x_2, y_2, x_2, y_2, hand_height)
-                    h_m = h 
-                    w_m = w 
-                    height_m = max(y1_perp, y2_perp, y3_perp, y4_perp) 
-                    width_m = max(x1_perp, x2_perp, x3_perp, x4_perp) 
-                    if height_m > h:
-                        h_m += height_m - h + 1 
-                    if width_m > w: 
-                        w_m += width_m - w + 1
-                    pts1 = np.float32([[x1_perp,y1_perp],[x3_perp,y3_perp],[x2_perp,y2_perp],[x4_perp,y4_perp]])
-                    pts2 = np.float32([[0,0],[h_m,0],[0,hand_height],[h_m,hand_height]])
-                    M = cv2.getPerspectiveTransform(pts1,pts2)
-                    dst = cv2.warpPerspective(rgb,M,(h_m,hand_height))
-                    lower_red = np.array([0,0,0])
-                    upper_red = np.array([255,255, 60]) # <--- Bo Zhang: Change last value
-                    mask = cv2.inRange(dst, lower_red, upper_red)
-                    cv2.imshow("Mask 2", mask) 
+                    
+                hand_height = (y_max_1-y_min_1)//2 
+                x1_perp, y1_perp, x2_perp, y2_perp = find_perpendicular_line(x_1, y_1, x_2, y_2, x_1, y_1, hand_height)
+                x3_perp, y3_perp, x4_perp, y4_perp = find_perpendicular_line(x_1, y_1, x_2, y_2, x_2, y_2, hand_height)
+                h_m = h 
+                w_m = w 
+                height_m = max(y1_perp, y2_perp, y3_perp, y4_perp) 
+                width_m = max(x1_perp, x2_perp, x3_perp, x4_perp) 
+                if height_m > h:
+                    h_m += height_m - h + 1 
+                if width_m > w: 
+                    w_m += width_m - w + 1
+                pts1 = np.float32([[x1_perp,y1_perp],[x3_perp,y3_perp],[x2_perp,y2_perp],[x4_perp,y4_perp]])
+                pts2 = np.float32([[0,0],[h_m,0],[0,hand_height],[h_m,hand_height]])
+                M = cv2.getPerspectiveTransform(pts1,pts2)
+                dst = cv2.warpPerspective(rgb,M,(h_m,hand_height))
+                lower_red = np.array([0,0,0])
+                upper_red = np.array([255,255, 60]) # <--- Change last value
+                mask = cv2.inRange(dst, lower_red, upper_red)
+                cv2.imshow("Mask 2", mask) 
         
         if results.multi_hand_landmarks: 
             for hl in results.multi_hand_landmarks:
