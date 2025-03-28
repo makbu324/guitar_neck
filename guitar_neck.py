@@ -226,7 +226,10 @@ try:
                     pts2 = np.float32([[0,0],[h_m,0],[0,hand_height],[h_m,hand_height]])
                     M = cv2.getPerspectiveTransform(pts1,pts2)
                     dst = cv2.warpPerspective(rgb,M,(h_m,hand_height))
-                    cv2.imshow("Mask 2", dst) 
+                    lower_red = np.array([0,0,0])
+                    upper_red = np.array([255,255, 60]) # <--- Bo Zhang: Change last value
+                    mask = cv2.inRange(dst, lower_red, upper_red)
+                    cv2.imshow("Mask 2", mask) 
         
         if results.multi_hand_landmarks: 
             for hl in results.multi_hand_landmarks:
